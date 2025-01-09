@@ -169,6 +169,11 @@ out/
 .fleet
 
 # Simulation GUI and other tools window save file
+<<<<<<< HEAD
+=======
+networktables.json
+simgui.json
+>>>>>>> Platy-0001-update-to-2025
 *-window.json
 
 # Simulation data log directory
@@ -176,3 +181,13 @@ logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
+<<<<<<< HEAD
+=======
+
+# clangd
+/.cache
+compile_commands.json
+
+# Eclipse generated file for annotation processors
+.factorypath
+>>>>>>> Platy-0001-update-to-2025
