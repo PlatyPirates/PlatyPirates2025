@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 import frc.robot.commands.AMoveEnd;
+import frc.robot.commands.MoveTowardsReefTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -51,6 +52,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
+    //autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive));
     autoChooser.addOption("Do nothing", 
         new RunCommand(
             () -> m_robotDrive.drive(0, 0, 0, true, true),
