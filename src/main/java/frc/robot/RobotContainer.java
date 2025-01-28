@@ -53,8 +53,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
-    autoChooser.addOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
+    //autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
+    autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
     autoChooser.addOption("Do nothing", 
         new RunCommand(
             () -> m_robotDrive.drive(0, 0, 0, true, true),
