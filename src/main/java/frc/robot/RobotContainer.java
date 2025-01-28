@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
@@ -44,6 +45,7 @@ public class RobotContainer {
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
 
+  private NetworkTableInstance netInst;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -52,7 +54,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
-    //autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive));
+    autoChooser.addOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
     autoChooser.addOption("Do nothing", 
         new RunCommand(
             () -> m_robotDrive.drive(0, 0, 0, true, true),
