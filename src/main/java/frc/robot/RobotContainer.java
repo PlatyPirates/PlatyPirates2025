@@ -63,8 +63,8 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY()*0.2, OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX()*0.2, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftY()*0.3, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX()*0.3, OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX()*0.5, OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
@@ -80,12 +80,14 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Safety feature (Hold right bumper and robot will stop)
     new JoystickButton(m_operatorController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_operatorController, Button.kL1.value)
+    // Resets direction to 0 degrees
+    new JoystickButton(m_driverController, Button.kL1.value)
         .whileTrue(new RunCommand(
           () -> m_robotDrive.zeroHeading(),
           m_robotDrive));
