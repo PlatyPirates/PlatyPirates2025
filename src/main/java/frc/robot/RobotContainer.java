@@ -24,10 +24,11 @@ import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 import frc.robot.commands.AMoveEnd;
-import frc.robot.commands.MoveTowardsReefTest;
+//import frc.robot.commands.MoveTowardsReefTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -42,9 +43,12 @@ public class RobotContainer {
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
   Intake m_intake = new Intake();
+  private boolean m_LimelightHasValidTarget = false;
+  private double m_LimelightDriveCommand = 0.0;
+  private double m_LimelightSteerCommand = 0.0;
 
   private NetworkTableInstance netInst;
 
@@ -55,7 +59,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     //autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
-    autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
+    //autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
     autoChooser.addOption("Do nothing", 
         new RunCommand(
             () -> m_robotDrive.drive(0, 0, 0, true, true),
@@ -91,16 +95,24 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Safety feature (Hold right bumper and robot will stop)
-    new JoystickButton(m_operatorController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    m_operatorController
+      .rightBumper()
+      .whileTrue(new RunCommand(
+        () -> m_robotDrive.setX(),
+        m_robotDrive));
 
     // Resets direction to 0 degrees
-    new JoystickButton(m_driverController, Button.kL1.value)
-        .whileTrue(new RunCommand(
-          () -> m_robotDrive.zeroHeading(),
-          m_robotDrive));
+    m_driverController
+      .leftTrigger()
+      .whileTrue(new RunCommand(
+        () -> m_robotDrive.zeroHeading(),
+        m_robotDrive));
+    
+    m_driverController 
+      .a()
+      .whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(m_LimelightDriveCommand, 0, m_LimelightSteerCommand, false, false)
+      ));
   }
 
   /**
@@ -110,5 +122,47 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  /**
+   * This function implements a simple method of generating driving and steering commands
+   * based on the tracking data from a limelight camera.
+   */
+  public void Update_Limelight_Tracking()
+  {
+        // These numbers must be tuned for your Robot!  Be careful!
+        final double STEER_K = 0.03;                    // how hard to turn toward the target
+        final double DRIVE_K = 0.26;                    // how hard to drive fwd toward the target
+        final double DESIRED_TARGET_AREA = 13.0;        // Area of the target when the robot reaches the wall
+        final double MAX_DRIVE = 0.7;                   // Simple speed limit so we don't drive too fast
+
+        double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+        double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+        double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+        if (tv < 1.0)
+        {
+          m_LimelightHasValidTarget = false;
+          m_LimelightDriveCommand = 0.0;
+          m_LimelightSteerCommand = 0.0;
+          return;
+        }
+
+        m_LimelightHasValidTarget = true;
+
+        // Start with proportional steering
+        double steer_cmd = tx * STEER_K;
+        m_LimelightSteerCommand = steer_cmd;
+
+        // try to drive forward until the target area reaches our desired area
+        double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
+
+        // don't let the robot drive too fast into the goal
+        if (drive_cmd > MAX_DRIVE)
+        {
+          drive_cmd = MAX_DRIVE;
+        }
+        m_LimelightDriveCommand = drive_cmd;
   }
 }
