@@ -46,7 +46,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    m_robotContainer.Update_Limelight_Tracking();
     //SmartDashboard.putNumber("Angle", m_robotContainer.m_robotDrive.getHeading());
   }
 
@@ -85,7 +84,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.Update_Limelight_Tracking();
+
+  }
 
   @Override
   public void testInit() {
