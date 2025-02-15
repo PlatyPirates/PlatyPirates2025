@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -27,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
-import frc.robot.commands.AMoveEnd;
 //import frc.robot.commands.MoveTowardsReefTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,7 +38,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotContainer {
   // The robot's subsystems
-  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  //public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -60,28 +58,28 @@ public class RobotContainer {
     configureButtonBindings();
     //autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
     //autoChooser.setDefaultOption("Drive Towards Reef AprilTag test", new MoveTowardsReefTest(m_robotDrive, netInst));
-    autoChooser.addOption("Do nothing", 
-        new RunCommand(
-            () -> m_robotDrive.drive(0, 0, 0, true, true),
-            m_robotDrive));
+   // autoChooser.addOption("Do nothing", 
+        // new RunCommand(
+        //     () -> m_robotDrive.drive(0, 0, 0, true, true),
+        //     m_robotDrive));
     SmartDashboard.putData("Auto Choices", autoChooser);
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY()*0.3, OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX()*0.3, OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX()*0.5, OIConstants.kDriveDeadband),
-                true, true),
-            m_robotDrive));
-    m_intake.setDefaultCommand(
-      new RunCommand(
-        () -> m_intake.setSpeed(m_operatorController.getLeftY()),
-        m_intake)
-    );
+    // m_robotDrive.setDefaultCommand(
+    //     // The left stick controls translation of the robot.
+    //     // Turning is controlled by the X axis of the right stick.
+    //     new RunCommand(
+    //         () -> m_robotDrive.drive(
+    //             -MathUtil.applyDeadband(m_driverController.getLeftY()*0.3, OIConstants.kDriveDeadband),
+    //             -MathUtil.applyDeadband(m_driverController.getLeftX()*0.3, OIConstants.kDriveDeadband),
+    //             -MathUtil.applyDeadband(m_driverController.getRightX()*0.5, OIConstants.kDriveDeadband),
+    //             true, true),
+    //         m_robotDrive));
+    // m_intake.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> m_intake.setSpeed(m_operatorController.getLeftY()),
+    //     m_intake)
+    // );
   }
 
   /**
@@ -95,23 +93,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Safety feature (Hold right bumper and robot will stop)
-    m_operatorController
-      .rightBumper()
-      .whileTrue(new RunCommand(
-        () -> m_robotDrive.setX(),
-        m_robotDrive));
-
-    // Resets direction to 0 degrees
-    m_driverController
-      .leftTrigger()
-      .whileTrue(new RunCommand(
-        () -> m_robotDrive.zeroHeading(),
-        m_robotDrive));
+ 
+      // .whileTrue(new RunCommand(
+      //   () -> m_robotDrive.zeroHeading(),
+      //   m_robotDrive));
     
     m_driverController 
       .a()
       .whileTrue(new RunCommand(
-        () -> m_robotDrive.drive(m_LimelightDriveCommand, 0, m_LimelightSteerCommand, false, false)
+        () -> m_intake.setSpeed(m_LimelightDriveCommand)
       ));
   }
 
