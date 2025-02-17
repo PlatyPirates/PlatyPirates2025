@@ -84,10 +84,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    m_robotContainer.Update_Limelight_Tracking();
-
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {
