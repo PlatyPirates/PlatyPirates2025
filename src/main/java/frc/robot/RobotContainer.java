@@ -20,6 +20,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveMotorFromLimelight;
+import frc.robot.commands.DriveRobotFromLimelight;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -30,6 +32,7 @@ import java.util.List;
 //import frc.robot.commands.MoveTowardsReefTest;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -45,6 +48,8 @@ public class RobotContainer {
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
   private Intake m_intake = new Intake();
+  private DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -60,22 +65,22 @@ public class RobotContainer {
         //     m_robotDrive));
     SmartDashboard.putData("Auto Choices", autoChooser);
 
-    // Configure default commands
-    // m_robotDrive.setDefaultCommand(
-    //     // The left stick controls translation of the robot.
-    //     // Turning is controlled by the X axis of the right stick.
-    //     new RunCommand(
-    //         () -> m_robotDrive.drive(
-    //             -MathUtil.applyDeadband(m_driverController.getLeftY()*0.3, OIConstants.kDriveDeadband),
-    //             -MathUtil.applyDeadband(m_driverController.getLeftX()*0.3, OIConstants.kDriveDeadband),
-    //             -MathUtil.applyDeadband(m_driverController.getRightX()*0.5, OIConstants.kDriveDeadband),
-    //             true, true),
-    //         m_robotDrive));
-    // m_intake.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> m_intake.setSpeed(m_operatorController.getLeftY()),
-    //     m_intake)
-    // );
+   // Configure default commands
+    m_driveSubsystem.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> m_driveSubsystem.drive(
+                -MathUtil.applyDeadband(m_driverController.getLeftY()*0.3, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX()*0.3, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX()*0.5, OIConstants.kDriveDeadband),
+                true, true),
+            m_driveSubsystem));
+    m_intake.setDefaultCommand(
+      new RunCommand(
+        () -> m_intake.setSpeed(m_operatorController.getLeftY()),
+        m_intake)
+    );
   }
 
   /**
@@ -96,7 +101,7 @@ public class RobotContainer {
     
     m_driverController 
       .a()
-      .whileTrue(new DriveMotorFromLimelight(m_intake)
+      .whileTrue(new DriveRobotFromLimelight(m_driveSubsystem)
       );
   }
 
