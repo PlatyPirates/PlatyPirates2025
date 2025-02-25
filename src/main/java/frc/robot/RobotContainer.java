@@ -21,11 +21,14 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AMoveEnd;
+import frc.robot.commands.DriveRobotFromLimelight;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
@@ -41,10 +44,10 @@ public class RobotContainer {
   private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
-
+  Intake m_intake = new Intake();
   Climber m_climber = new Climber();
 
   /**
@@ -73,6 +76,12 @@ public class RobotContainer {
                 true),
             m_robotDrive));
 
+    m_intake.setDefaultCommand(
+        new RunCommand(
+            () -> m_intake.setSpeed(m_operatorController.getLeftY()),
+            m_intake)
+    );
+
     m_climber.setDefaultCommand(
       new RunCommand(
         () -> m_climber.setSpeed(m_operatorController.getRightY())
@@ -90,15 +99,23 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
+
+    m_driverController
+      .rightBumper()
+      .whileTrue(new RunCommand(
+        () -> m_robotDrive.setX(),
             m_robotDrive));
-     // Resets direction to 0 degrees
-     new JoystickButton(m_driverController, Button.kL1.value)
-     .whileTrue(new RunCommand(
-       () -> m_robotDrive.zeroHeading(),
-       m_robotDrive));
+
+    m_driverController
+      .leftBumper()
+      .whileTrue(new RunCommand(
+        () -> m_robotDrive.zeroHeading(),
+        m_robotDrive));
+
+     m_driverController
+      .a()
+      .whileTrue(new DriveRobotFromLimelight(m_robotDrive)
+      ); 
   }
 
   /**
