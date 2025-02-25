@@ -66,6 +66,9 @@ public final class Constants {
 
     public static final int kGyroCanId = 9;
 
+    public static final int kRightClimberCanId = 10;
+    public static final int kLeftClimberCanId = 11;
+
     public static final boolean kGyroReversed = false;
   }
 
