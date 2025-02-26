@@ -58,11 +58,12 @@ public class RobotContainer {
     configureButtonBindings();
 
     autoChooser.setDefaultOption("Cross Auto Line Only", new AMoveEnd(m_robotDrive));
+    autoChooser.addOption("Drive Robot From Limelight", new DriveRobotFromLimelight(m_robotDrive));
     autoChooser.addOption("Do Nothing",
-      new RunCommand(
-        ()-> m_robotDrive.drive(0.0,0.0,0.0,true), m_robotDrive)
-    );
-
+    new RunCommand(
+      ()-> m_robotDrive.drive(0.0,0.0,0.0,true), m_robotDrive)
+  );
+  
     SmartDashboard.putData("Auto Choices", autoChooser);
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -84,7 +85,8 @@ public class RobotContainer {
 
     m_climber.setDefaultCommand(
       new RunCommand(
-        () -> m_climber.setSpeed(m_operatorController.getRightY())
+        () -> m_climber.setSpeed(m_operatorController.getRightY()),
+        m_climber
         )
     );
   }
